@@ -19,7 +19,7 @@ extrato = ""
 numero_saques = 0
 limite_saque = 3
 
-# Loop de repetição contendo, menu e opções que serão apresentadas ao usuário
+# Loop de repetição, que exibe menu e opções que serão apresentadas ao usuário
 while True:
     print('Sistema Bancário')
     print (menu)
