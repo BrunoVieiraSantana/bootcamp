@@ -1,10 +1,29 @@
 import os
 
 def criar_usuario(usuarios):
-    pass
+    print('Digite os dados necessarios')
+    nome = input('Nome: ')
+    cpf = input('CPF (somente números): ')
+    data_nascimento = input('Data de Nascimento: (formato dd/mm/aaa): ')
+    print('Endereço')
+    rua = input('Rua: ')
+    numero = input('Número: ')
+    bairro = input('Bairro: ')
+    cidade = input('Cidade: ')
+    estado = input('Estado (ex: CE): ')
+    endereco = f"{rua}, {numero}, {bairro}, {cidade} - {estado}"
+    usuarios.append({"nome": nome, "data_nascimento": data_nascimento, "cpf": cpf, "endereco": endereco})
+    limpar_tela()
+    print('Usúario criado com sucesso!\n' )
 
-def criar_conta(agencia, numero_conta, usuarios):
-    pass
+
+def criar_conta(contas, agencia, numero_conta, usuarios):
+    print('Digite o CPF do Titular da Nova Conta')
+    cpf = input('CPF: ')
+    usuario = usuarios[0]
+    contas.append({"agencia": agencia, "numero_conta": numero_conta, "usuario": usuario})
+    print('Conta criada com sucesso!\n' )
+
 
 def menu_principal():
     menu= """
@@ -81,15 +100,16 @@ def main():
     limite_saque = 3
     usuarios = []
     contas = []
+    numero_conta = 0
+    limpar_tela()
     print('Sistema Bancário')
     while True:
-        limpar_tela()
         escolha_principal = menu_principal()
         if escolha_principal == "1":
-            saque()
+            criar_usuario(usuarios)
 
         elif escolha_principal == "2":
-            depositar()
+            criar_conta(contas, agencia, numero_conta, usuarios)
 
         elif escolha_principal == "3":
             os.system('cls')
