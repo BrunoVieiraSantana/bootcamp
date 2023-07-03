@@ -7,8 +7,8 @@ os.system('cls')
 menu= """
 Digite o número referente à opção desejada:
 
-    [1] Depositar
-    [2] Sacar
+    [1] Depósito
+    [2] Saque
     [3] Extrato
     [0] Sair
 """
