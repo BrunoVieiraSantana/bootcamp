@@ -5,7 +5,7 @@ os.system('cls')
 
 # Variável com as opções   
 menu= """
-Digite o número referente a opção desejada:
+Digite o número referente à opção desejada:
 
     [1] Depositar
     [2] Sacar
@@ -41,7 +41,7 @@ while True:
 
         if numero_saques > 3:
             os.system('cls')
-            print('Número de saques realizados excedido') 
+            print('Número máximo de saques excedido') 
         elif valor > 0:
             print('Digite o valor do saque:')
             valor = float(input('> '))
@@ -68,7 +68,7 @@ while True:
 
     elif escolha == "0":
         os.system('cls')
-        print("Agradecemos a preferência! Até mais!!!")
+        print("Agradecemos a preferência! Até mais!")
         break
 
 
