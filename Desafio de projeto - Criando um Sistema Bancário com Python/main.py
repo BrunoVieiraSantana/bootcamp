@@ -26,16 +26,51 @@ while True:
     escolha = input('> ')
 
     if escolha == "1":
-        pass
+        print('Digite o valor do deposito:')
+        valor = float(input('> '))
+        if valor > 0:
+            extrato+= f"Depósito: R$ {valor:.2f}\n"
+            saldo+=valor
+            os.system('cls')
+            print('Operação realizada com sucesso!\n')
+        else:
+            print('Digite um valor válido\n')
+
 
     elif escolha == "2":
-        pass
+
+        if numero_saques > 3:
+            os.system('cls')
+            print('Número de saques realizados excedido') 
+        elif valor > 0:
+            print('Digite o valor do saque:')
+            valor = float(input('> '))
+            extrato+= f"Saque: R$ {valor:.2f}\n"
+            saldo-=valor
+            numero_saques+=1
+            os.system('cls')
+            print('Operação realizada com sucesso!\n')
+        else:
+            print('Digite um valor válido\n')
+
+
     elif escolha == "3":
-        pass
+        if len(extrato) == 0:
+            os.system('cls')
+            print('Nenhuma operação realizada.\n')
+        else:
+            os.system('cls')
+            print(f"{' - '*4}Extrato{' - '*4}")
+            print(extrato)
+            print(f"Saldo: R$ {saldo:.2f}")
+            print(f"{' - '*10}\n")
+
 
     elif escolha == "0":
+        os.system('cls')
         print("Agradecemos a preferência! Até mais!!!")
         break
+
 
     else:
         os.system('cls')
