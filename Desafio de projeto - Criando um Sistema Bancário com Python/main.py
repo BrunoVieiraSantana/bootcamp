@@ -39,7 +39,7 @@ while True:
 
     elif escolha == "2":
 
-        if numero_saques > 3:
+        if numero_saques >= 3:
             os.system('cls')
             print('Número máximo de saques excedido') 
         elif valor > 0:
