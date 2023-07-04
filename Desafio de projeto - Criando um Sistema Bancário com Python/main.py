@@ -3,7 +3,7 @@ import os
 # Código utilizado para limpar o terminal
 os.system('cls')
 
-# Variável com as opções   
+# Variável com as opções de menu 
 menu= """
 Digite o número referente à opção desejada:
 
