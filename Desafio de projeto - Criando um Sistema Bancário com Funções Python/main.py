@@ -36,35 +36,46 @@ def criar_usuario(usuarios):
     usuarios.append({"nome": nome, "data_nascimento": data_nascimento, "cpf": cpf, "endereco": endereco})
     limpar_tela()
     print('Usúario criado com sucesso!\n' )
-    print(usuarios)
 
 
-def criar_conta(contas, agencia, numero_conta, usuarios):
-    print('Digite o CPF do Titular da Nova Conta')
-    cpf = input('CPF: ')
+def criar_conta(contas, agencia, usuarios):
     while True:
+        print('Digite o CPF do Titular da Nova Conta')
         cpf = (input('CPF (somente números): '))
+        usuario = None
+        for i, numero in enumerate(usuarios):
+            if cpf == (numero['cpf']):
+                usuario = usuarios[i]
         try:
-            cpf_teste = int(cpf)
-            teste = 0
-            if len(cpf) == 11:
-                for i, numero in enumerate(usuarios):
-                    if cpf == (numero['cpf']):
-                        usuario = usuarios[i]
-                if teste > 0:
-                    print('CPF já cadastrado')
-                elif teste == 0:
-                    break
-            else:
-                print('O CPF deve conter 11 números.')
+            if len(usuario) != 0:
+                break
         except:
-            limpar_tela()
-            print('Digite apenas números')
+            print('CPF não cadastrado')
+
     print(usuario)
-    numero_conta+= 1
-    contas.append({"agencia": agencia, "numero_conta": numero_conta, "usuario": usuario})
+    numero_conta = len(contas)+1
+    contas.append({"agencia": agencia, "numero_conta": numero_conta, "usuario": usuario, "saldo": 0, "numero_saque":0, "extrato":""})
     print(contas)
     print('Conta criada com sucesso!\n' )
+
+def definir_usuario_conta(usuarios, contas):
+    print("Digite o número referente ao usuário")
+    for i, nome in enumerate(usuarios):
+        print(f"    {i+1} - {nome['nome']}")
+    escolha = int(input('> '))
+    usuario_selecionado = usuarios[escolha-1]
+
+    print("Digite o número referente a conta")
+    for conta in contas:
+        if usuario_selecionado['cpf'] == (conta['usuario']['cpf']):
+            print(f"Conta: {conta['numero_conta']} - Saldo: {conta['saldo']}")
+    escolha_conta = int(input('> '))
+    for conta in contas:
+        if escolha_conta == (conta['numero_conta']):
+            print(f"Está conta foi selecionada {conta}")
+            return conta
+
+
 
 
 def menu_principal():
@@ -96,12 +107,18 @@ Digite o número referente à opção desejada:
 def limpar_tela():
     os.system('cls')
 
-def depositar(saldo, valor, extrato, /):
+def depositar(conta, saldo, extrato, numero, /):
     print('Digite o valor do deposito:')
     valor = float(input('> '))
     if valor > 0:
+        
         extrato+= f"Depósito: R$ {valor:.2f}\n"
         saldo+=valor
+        numero+=1
+        conta['extrato'] = extrato
+        conta['saldo'] = saldo
+        conta['numero_saque'] = numero
+
         os.system('cls')
         print('Operação realizada com sucesso!\n')
     else:
@@ -142,28 +159,29 @@ def main():
     limite_saque = 3
     usuarios = []
     contas = []
-    numero_conta = 0
     limpar_tela()
     print('Sistema Bancário')
     while True:
+        print(contas)
         escolha_principal = menu_principal()
         if escolha_principal == "1":
             criar_usuario(usuarios)
 
         elif escolha_principal == "2":
-            criar_conta(contas, agencia, numero_conta, usuarios)
+            criar_conta(contas, agencia, usuarios)
 
         elif escolha_principal == "3":
             os.system('cls')
+            login = definir_usuario_conta(usuarios, contas)
             escolha = menu_operacoes()
             if escolha == "1":
-                saque()
+                depositar(contas[0],login['saldo'], login['extrato'], login['numero_saque'])
 
             elif escolha == "2":
-                depositar()
+                saque()
 
             elif escolha == "3":
-                exibir_extrato()
+                exibir_extrato(login['saldo'], extrato=login['extrato'])
 
             elif escolha == "0":
                 limpar_tela()
