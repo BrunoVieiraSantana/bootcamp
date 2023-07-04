@@ -3,7 +3,28 @@ import os
 def criar_usuario(usuarios):
     print('Digite os dados necessarios')
     nome = input('Nome: ')
-    cpf = input('CPF (somente números): ')
+
+    # Verificação de CPF formado apenas por números, contendo 11 dígitos e que não possam existir duplicatas.
+    while True:
+        cpf = (input('CPF (somente números): '))
+        try:
+            cpf_teste = int(cpf)
+            teste = 0
+            if len(cpf) == 11:
+                for i in usuarios:
+                    if cpf == (i['cpf']):
+                        teste+= 1
+                if teste > 0:
+                    print('CPF já cadastrado')
+                elif teste == 0:
+                    break
+            else:
+                print('O CPF deve conter 11 números.')
+        except:
+            limpar_tela()
+            print('Digite apenas números')
+
+
     data_nascimento = input('Data de Nascimento: (formato dd/mm/aaa): ')
     print('Endereço')
     rua = input('Rua: ')
@@ -15,13 +36,34 @@ def criar_usuario(usuarios):
     usuarios.append({"nome": nome, "data_nascimento": data_nascimento, "cpf": cpf, "endereco": endereco})
     limpar_tela()
     print('Usúario criado com sucesso!\n' )
+    print(usuarios)
 
 
 def criar_conta(contas, agencia, numero_conta, usuarios):
     print('Digite o CPF do Titular da Nova Conta')
     cpf = input('CPF: ')
-    usuario = usuarios[0]
+    while True:
+        cpf = (input('CPF (somente números): '))
+        try:
+            cpf_teste = int(cpf)
+            teste = 0
+            if len(cpf) == 11:
+                for i, numero in enumerate(usuarios):
+                    if cpf == (numero['cpf']):
+                        usuario = usuarios[i]
+                if teste > 0:
+                    print('CPF já cadastrado')
+                elif teste == 0:
+                    break
+            else:
+                print('O CPF deve conter 11 números.')
+        except:
+            limpar_tela()
+            print('Digite apenas números')
+    print(usuario)
+    numero_conta+= 1
     contas.append({"agencia": agencia, "numero_conta": numero_conta, "usuario": usuario})
+    print(contas)
     print('Conta criada com sucesso!\n' )
 
 
