@@ -4,7 +4,7 @@ def criar_usuario(usuarios):
     print('Digite os dados necessarios')
     nome = input('Nome: ')
 
-    # Verificação de CPF formado apenas por números, contendo 11 dígitos e que não possam existir duplicatas.
+    # Verificação de CPF formado apenas por números, contendo 11 dígitos e que não possam existir duplicatas
     while True:
         cpf = (input('CPF (somente números): '))
         try:
