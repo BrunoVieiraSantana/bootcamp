@@ -107,37 +107,41 @@ Digite o número referente à opção desejada:
 def limpar_tela():
     os.system('cls')
 
-def depositar(conta, saldo, extrato, numero, /):
+def depositar(conta, saldo, extrato, /):
     print('Digite o valor do deposito:')
     valor = float(input('> '))
     if valor > 0:
         
         extrato+= f"Depósito: R$ {valor:.2f}\n"
         saldo+=valor
-        numero+=1
         conta['extrato'] = extrato
         conta['saldo'] = saldo
-        conta['numero_saque'] = numero
 
         os.system('cls')
         print('Operação realizada com sucesso!\n')
     else:
         print('Digite um valor válido\n')
 
-def saque(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
+def saque(*, conta, saldo, extrato, limite, numero_saques):
     if numero_saques >= 3:
         os.system('cls')
         print('Número máximo de saques excedido') 
-    elif valor > 0:
+    elif numero_saques < 3:
         print('Digite o valor do saque:')
         valor = float(input('> '))
-        extrato+= f"Saque: R$ {valor:.2f}\n"
-        saldo-=valor
-        numero_saques+=1
-        os.system('cls')
-        print('Operação realizada com sucesso!\n')
-    else:
-        print('Digite um valor válido\n')
+        if valor > 0 and valor < limite:
+            extrato+= f"Saque: R$ {valor:.2f}\n"
+            saldo-=valor
+            numero_saques+=1
+
+            conta['extrato'] = extrato
+            conta['saldo'] = saldo
+            conta['numero_saque'] = numero_saques
+
+            os.system('cls')
+            print('Operação realizada com sucesso!\n')
+        else:
+            print('Digite um valor válido, que não ultrapasse os R$ 500,00\n')
 
 def exibir_extrato(saldo, /, *, extrato):
     if len(extrato) == 0:
@@ -175,10 +179,10 @@ def main():
             login = definir_usuario_conta(usuarios, contas)
             escolha = menu_operacoes()
             if escolha == "1":
-                depositar(contas[0],login['saldo'], login['extrato'], login['numero_saque'])
+                depositar(contas[0],login['saldo'], login['extrato'])
 
             elif escolha == "2":
-                saque()
+                saque(conta=contas[0], saldo=login['saldo'], extrato=login['extrato'], limite=limite, numero_saques=login['numero_saque'])
 
             elif escolha == "3":
                 exibir_extrato(login['saldo'], extrato=login['extrato'])
