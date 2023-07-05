@@ -54,7 +54,7 @@ def criar_conta(contas, agencia, usuarios):
 
     numero_conta = len(contas)+1
     contas.append({"agencia": agencia, "numero_conta": numero_conta, "usuario": usuario, "saldo": 0, "numero_saque":0, "extrato":""})
-
+    limpar_tela()
     print('Conta criada com sucesso!\n' )
 
 def definir_usuario_conta(usuarios, contas):
@@ -174,6 +174,7 @@ def main():
         elif escolha_principal == "3":
             limpar_tela()
             login = definir_usuario_conta(usuarios, contas)
+            limpar_tela()
             while True:
                 escolha = menu_operacoes()
                 if escolha == "1":
@@ -183,7 +184,7 @@ def main():
                     saque(conta=contas[login[1]], saldo=login[0]['saldo'], extrato=login[0]['extrato'], limite=limite, numero_saques=login[0]['numero_saque'])
 
                 elif escolha == "3":
-                    exibir_extrato(login['saldo'], extrato=login['extrato'])
+                    exibir_extrato(login[0]['saldo'], extrato=login[0]['extrato'])
 
                 elif escolha == "0":
                     limpar_tela()
@@ -203,6 +204,5 @@ def main():
             limpar_tela()
             print('Operação invalida, tente novamente.')
         
-
 
 main()
