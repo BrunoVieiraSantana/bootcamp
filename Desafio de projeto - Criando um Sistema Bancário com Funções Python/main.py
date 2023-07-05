@@ -52,10 +52,9 @@ def criar_conta(contas, agencia, usuarios):
         except:
             print('CPF não cadastrado')
 
-    print(usuario)
     numero_conta = len(contas)+1
     contas.append({"agencia": agencia, "numero_conta": numero_conta, "usuario": usuario, "saldo": 0, "numero_saque":0, "extrato":""})
-    print(contas)
+
     print('Conta criada com sucesso!\n' )
 
 def definir_usuario_conta(usuarios, contas):
@@ -70,10 +69,9 @@ def definir_usuario_conta(usuarios, contas):
         if usuario_selecionado['cpf'] == (conta['usuario']['cpf']):
             print(f"Conta: {conta['numero_conta']} - Saldo: {conta['saldo']}")
     escolha_conta = int(input('> '))
-    for conta in contas:
+    for i, conta in enumerate(contas):
         if escolha_conta == (conta['numero_conta']):
-            print(f"Está conta foi selecionada {conta}")
-            return conta
+            return [conta, i]
 
 
 
@@ -166,7 +164,6 @@ def main():
     limpar_tela()
     print('Sistema Bancário')
     while True:
-        print(contas)
         escolha_principal = menu_principal()
         if escolha_principal == "1":
             criar_usuario(usuarios)
@@ -175,26 +172,27 @@ def main():
             criar_conta(contas, agencia, usuarios)
 
         elif escolha_principal == "3":
-            os.system('cls')
+            limpar_tela()
             login = definir_usuario_conta(usuarios, contas)
-            escolha = menu_operacoes()
-            if escolha == "1":
-                depositar(contas[0],login['saldo'], login['extrato'])
+            while True:
+                escolha = menu_operacoes()
+                if escolha == "1":
+                    depositar(contas[login[1]],login[0]['saldo'], login[0]['extrato'])
 
-            elif escolha == "2":
-                saque(conta=contas[0], saldo=login['saldo'], extrato=login['extrato'], limite=limite, numero_saques=login['numero_saque'])
+                elif escolha == "2":
+                    saque(conta=contas[login[1]], saldo=login[0]['saldo'], extrato=login[0]['extrato'], limite=limite, numero_saques=login[0]['numero_saque'])
 
-            elif escolha == "3":
-                exibir_extrato(login['saldo'], extrato=login['extrato'])
+                elif escolha == "3":
+                    exibir_extrato(login['saldo'], extrato=login['extrato'])
 
-            elif escolha == "0":
-                limpar_tela()
-                print("Agradecemos a preferência! Até mais!")
-                break
+                elif escolha == "0":
+                    limpar_tela()
+                    print("Agradecemos a preferência! Até mais!")
+                    break
 
-            else:
-                limpar_tela()
-                print('Operação invalida, tente novamente.')
+                else:
+                    limpar_tela()
+                    print('Operação invalida, tente novamente.')
 
         elif escolha_principal == "0":
             limpar_tela()
