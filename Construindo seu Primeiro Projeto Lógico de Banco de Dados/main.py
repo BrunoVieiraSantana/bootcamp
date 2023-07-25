@@ -1,177 +1,150 @@
 import sqlite3
 
-def criar_tabelas():
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
+def conectar_banco_dados():
+    return sqlite3.connect('ecommerce.db')
+
+def setup_banco_dados():
+
+    conn = sqlite3.connect('ecommerce.db')
+    cursor = conn.cursor()
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS clientes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             nome TEXT NOT NULL,
-            veiculo TEXT NOT NULL,
-            valor_total REAL NOT NULL
+            tipo TEXT NOT NULL
         )
     ''')
 
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS servicos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+        CREATE TABLE IF NOT EXISTS pagamentos (
+            id INTEGER PRIMARY KEY,
             cliente_id INTEGER NOT NULL,
-            descricao TEXT NOT NULL,
-            valor REAL NOT NULL,
-            FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+            forma_pagamento TEXT NOT NULL,
+            FOREIGN KEY (cliente_id) REFERENCES clientes (id)
         )
     ''')
 
-    conexao.commit()
-    conexao.close()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS entregas (
+            id INTEGER PRIMARY KEY,
+            cliente_id INTEGER NOT NULL,
+            status TEXT NOT NULL,
+            codigo_rastreio TEXT NOT NULL,
+            FOREIGN KEY (cliente_id) REFERENCES clientes (id)
+        )
+    ''')
 
-def inserir_cliente(nome, veiculo, valor_total):
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
+    conn.commit()
+    conn.close()
 
-    cursor.execute('INSERT INTO clientes (nome, veiculo, valor_total) VALUES (?, ?, ?)', (nome, veiculo, valor_total))
+def adicionar_cliente(nome, tipo):
+    conn = conectar_banco_dados()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO clientes (nome, tipo) VALUES (?, ?)', (nome, tipo))
+    conn.commit()
+    conn.close()
 
-    conexao.commit()
-    conexao.close()
-
-def inserir_servico(cliente_id, descricao, valor):
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
-
-    cursor.execute('INSERT INTO servicos (cliente_id, descricao, valor) VALUES (?, ?, ?)', (cliente_id, descricao, valor))
-
-    conexao.commit()
-    conexao.close()
-
-def recuperacao_simples():
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
-
+def recuperar_clientes():
+    conn = conectar_banco_dados()
+    cursor = conn.cursor()
     cursor.execute('SELECT * FROM clientes')
+    clientes = cursor.fetchall()
+    conn.close()
+    return clientes
 
-    for row in cursor.fetchall():
-        print(row)
+def filtrar_clientes(tipo_cliente):
+    conn = conectar_banco_dados()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM clientes WHERE tipo = ?', (tipo_cliente,))
+    clientes = cursor.fetchall()
+    conn.close()
+    return clientes
 
-    conexao.close()
+def criar_atributo_derivado():
+    conn = conectar_banco_dados()
+    cursor = conn.cursor()
 
-def filtro_por_veiculo(veiculo):
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
+    cursor.execute('SELECT *, (SELECT COUNT(*) FROM pagamentos WHERE pagamentos.cliente_id = clientes.id) AS total_pagamentos FROM clientes')
+    clientes = cursor.fetchall()
+    conn.close()
+    return clientes
 
-    cursor.execute('SELECT * FROM clientes WHERE veiculo = ?', (veiculo,))
+def ordenar_clientes_por_nome():
+    conn = conectar_banco_dados()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM clientes ORDER BY nome')
+    clientes = cursor.fetchall()
+    conn.close()
+    return clientes
 
-    for row in cursor.fetchall():
-        print(row)
-
-    conexao.close()
-
-def atributo_derivado():
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
-
-    cursor.execute('SELECT clientes.id, clientes.nome, clientes.veiculo, clientes.valor_total, SUM(servicos.valor) AS valor_servicos '
-                   'FROM clientes '
-                   'LEFT JOIN servicos ON clientes.id = servicos.cliente_id '
-                   'GROUP BY clientes.id')
-
-    for row in cursor.fetchall():
-        print(row)
-
-    conexao.close()
-
-def ordenacao_por_valor_total():
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
-
-    cursor.execute('SELECT * FROM clientes ORDER BY valor_total DESC')
-
-    for row in cursor.fetchall():
-        print(row)
-
-    conexao.close()
-
-def filtro_por_valor_servicos_minimo(valor_minimo):
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
-
-    cursor.execute('SELECT clientes.id, clientes.nome, clientes.valor_total, SUM(servicos.valor) AS valor_servicos '
-                   'FROM clientes '
-                   'LEFT JOIN servicos ON clientes.id = servicos.cliente_id '
-                   'GROUP BY clientes.id '
-                   'HAVING valor_servicos >= ?', (valor_minimo,))
-
-    for row in cursor.fetchall():
-        print(row)
-
-    conexao.close()
-
-def juncao_entre_tabelas():
-    conexao = sqlite3.connect('oficina.db')
-    cursor = conexao.cursor()
-
-    cursor.execute('SELECT clientes.nome, clientes.veiculo, COUNT(servicos.id) AS total_servicos '
-                   'FROM clientes '
-                   'LEFT JOIN servicos ON clientes.id = servicos.cliente_id '
-                   'GROUP BY clientes.id')
-
-    for row in cursor.fetchall():
-        print(row)
-
-    conexao.close()
-
-def exibir_menu():
-    print("1. Inserir cliente")
-    print("2. Inserir serviço")
-    print("3. Recuperação simples (SELECT)")
-    print("4. Filtro por veículo (WHERE)")
-    print("5. Atributo derivado")
-    print("6. Ordenação por valor total (ORDER BY)")
-    print("7. Filtro por valor mínimo de serviços (HAVING)")
-    print("8. Junção entre tabelas")
-    print("0. Sair")
+def filtrar_clientes_por_pagamento(forma_pagamento):
+    conn = conectar_banco_dados()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT clientes.* FROM clientes
+        INNER JOIN pagamentos ON clientes.id = pagamentos.cliente_id
+        WHERE pagamentos.forma_pagamento = ?
+    ''', (forma_pagamento,))
+    clientes = cursor.fetchall()
+    conn.close()
+    return clientes
 
 def main():
-    criar_tabelas()
-
+    setup_banco_dados()
+    
     while True:
-        exibir_menu()
+        print("\n===== MENU INTERATIVO =====")
+        print("1 - Recuperar todos os clientes")
+        print("2 - Filtrar clientes por tipo (PJ ou PF)")
+        print("3 - Criar atributo derivado (exemplo: total de pagamentos)")
+        print("4 - Ordenar clientes por nome")
+        print("5 - Filtrar clientes por forma de pagamento")
+        print("6 - Adicionar novo cliente")
+        print("0 - Sair")
+
         opcao = input("Digite o número da opção desejada: ")
 
         if opcao == "1":
-            nome = input("Digite o nome do cliente: ")
-            veiculo = input("Digite o veículo do cliente: ")
-            valor_total = float(input("Digite o valor total do cliente: "))
-            inserir_cliente(nome, veiculo, valor_total)
+            clientes = recuperar_clientes()
+            print("\n===== CLIENTES =====")
+            for cliente in clientes:
+                print(cliente)
 
         elif opcao == "2":
-            cliente_id = int(input("Digite o ID do cliente: "))
-            descricao = input("Digite a descrição do serviço: ")
-            valor = float(input("Digite o valor do serviço: "))
-            inserir_servico(cliente_id, descricao, valor)
+            tipo_cliente = input("Digite o tipo de cliente (PJ ou PF): ")
+            clientes = filtrar_clientes(tipo_cliente)
+            print("\n===== CLIENTES FILTRADOS =====")
+            for cliente in clientes:
+                print(cliente)
 
         elif opcao == "3":
-            recuperacao_simples()
+            clientes = criar_atributo_derivado()
+            print("\n===== CLIENTES COM ATRIBUTO DERIVADO =====")
+            for cliente in clientes:
+                print(cliente)
 
         elif opcao == "4":
-            veiculo = input("Digite o veículo desejado: ")
-            filtro_por_veiculo(veiculo)
+            clientes = ordenar_clientes_por_nome()
+            print("\n===== CLIENTES ORDENADOS POR NOME =====")
+            for cliente in clientes:
+                print(cliente)
 
         elif opcao == "5":
-            atributo_derivado()
+            forma_pagamento = input("Digite a forma de pagamento: ")
+            clientes = filtrar_clientes_por_pagamento(forma_pagamento)
+            print("\n===== CLIENTES FILTRADOS POR FORMA DE PAGAMENTO =====")
+            for cliente in clientes:
+                print(cliente)
 
         elif opcao == "6":
-            ordenacao_por_valor_total()
-
-        elif opcao == "7":
-            valor_minimo = float(input("Digite o valor mínimo de serviços: "))
-            filtro_por_valor_servicos_minimo(valor_minimo)
-
-        elif opcao == "8":
-            juncao_entre_tabelas()
+            nome = input("Digite o nome do cliente: ")
+            tipo = input("Digite o tipo do cliente (PJ ou PF): ")
+            adicionar_cliente(nome, tipo)
+            print("Cliente adicionado com sucesso!")
 
         elif opcao == "0":
-            print("Saindo...")
+            print("Saindo do programa.")
             break
 
         else:
